@@ -1,2 +1,13 @@
+<<<<<<< HEAD
 # dependencies
 /node_modules
+=======
+node_modules
+
+.env
+
+uploads/*
+!uploads/.gitkeep
+
+*.lock
+>>>>>>> 6645203565b2ebcabceac73ad18154a34b2c81e3

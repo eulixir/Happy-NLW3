@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { getRepository } from 'typeorm';
+<<<<<<< HEAD
 import orphanageView from '../views/orphanages_view';
 import * as Yup from 'yup';
 
@@ -18,10 +19,30 @@ export default {
 
   async show(request: Request, response: Response) {
     const { id } = request.params;
+=======
+import * as Yup from 'yup';
+
+import Orphanage from '../models/Orphanage';
+import orphanageView from '../views/orphanages_view';
+
+export default {
+  async index(req: Request, res: Response) {
+    const orphanagesRepository = getRepository(Orphanage);
+
+    const orphanages = await orphanagesRepository.find({
+      relations: ['images'],
+    });
+
+    return res.json(orphanageView.renderMany(orphanages));
+  },
+  async show(req: Request, res: Response) {
+    const { id } = req.params;
+>>>>>>> 6645203565b2ebcabceac73ad18154a34b2c81e3
 
     const orphanagesRepository = getRepository(Orphanage);
 
     const orphanage = await orphanagesRepository.findOneOrFail(id, {
+<<<<<<< HEAD
       relations: [ 'images' ]
     });
 
@@ -57,6 +78,21 @@ export default {
       open_on_weekends: open_on_weekends === 'true',
       images
     };
+=======
+      relations: ['images'],
+    });
+
+    return res.json(orphanageView.render(orphanage));
+  },
+  async create(req: Request, res: Response) {
+    const orphanagesRepository = getRepository(Orphanage);
+
+    const requestImages = req.files as Express.Multer.File[];
+
+    const images = requestImages.map((image) => {
+      return { path: image.filename };
+    });
+>>>>>>> 6645203565b2ebcabceac73ad18154a34b2c81e3
 
     const schema = Yup.object().shape({
       name: Yup.string().required(),
@@ -68,6 +104,7 @@ export default {
       open_on_weekends: Yup.boolean().required(),
       images: Yup.array(
         Yup.object().shape({
+<<<<<<< HEAD
           path: Yup.string().required()
         })
       )
@@ -84,3 +121,29 @@ export default {
     return response.status(201).json(orphanage);
   }
 };
+=======
+          path: Yup.string().required(),
+        })
+      ),
+    });
+
+    let { open_on_weekends } = req.body;
+    open_on_weekends = open_on_weekends.toLowerCase() === 'true';
+
+    await schema.validate(
+      { ...req.body, open_on_weekends, images },
+      { abortEarly: false }
+    );
+
+    const orphanage = orphanagesRepository.create({
+      ...req.body,
+      open_on_weekends,
+      images,
+    });
+
+    await orphanagesRepository.save(orphanage);
+
+    return res.status(201).json(orphanage);
+  },
+};
+>>>>>>> 6645203565b2ebcabceac73ad18154a34b2c81e3
